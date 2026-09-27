@@ -3,6 +3,8 @@ import { useFamilyTree } from './hooks/useFamilyTree';
 import { usePanZoom } from './hooks/usePanZoom';
 import { Header } from './components/Header';
 import { TreeCanvas } from './components/TreeCanvas';
+import { VerticalOutlineView } from './components/VerticalOutlineView';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { ControlsOverlay } from './components/ControlsOverlay';
 import { MemberModal } from './components/MemberModal';
 import { MemberDetailDrawer } from './components/MemberDetailDrawer';
@@ -34,6 +36,11 @@ export default function App() {
   const panZoom = usePanZoom(1);
   const exportRef = useRef(null);
 
+  // View mode: 'canvas' or 'outline'
+  const [viewMode, setViewMode] = useState(() => {
+    return window.innerWidth < 640 ? 'canvas' : 'canvas';
+  });
+
   // Modals & Drawers state
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
@@ -43,7 +50,7 @@ export default function App() {
   // Member Modal State
   const [memberModalConfig, setMemberModalConfig] = useState({
     isOpen: false,
-    mode: 'edit', // 'add-child', 'add-parent', 'add-spouse', 'edit'
+    mode: 'edit',
     targetNode: null,
   });
 
@@ -103,8 +110,13 @@ export default function App() {
 
   // Focus and center member on canvas
   const handleFocusMember = useCallback((memberId) => {
-    panZoom.centerNode(`node-${memberId}`);
-  }, [panZoom]);
+    if (viewMode !== 'canvas') {
+      setViewMode('canvas');
+    }
+    setTimeout(() => {
+      panZoom.centerNode(`node-${memberId}`);
+    }, 100);
+  }, [panZoom, viewMode]);
 
   // Handle Delete with confirmation
   const handleDeleteMember = useCallback((node) => {
@@ -118,7 +130,6 @@ export default function App() {
   // Global Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Escape to close drawers/modals
       if (e.key === 'Escape') {
         setIsStatsOpen(false);
         setIsTemplatesOpen(false);
@@ -126,7 +137,6 @@ export default function App() {
         setIsDrawerOpen(false);
         setMemberModalConfig(prev => ({ ...prev, isOpen: false }));
       }
-      // Ctrl+Z / Cmd+Z for undo
       if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
         if (canUndo) {
           undo();
@@ -143,6 +153,8 @@ export default function App() {
       {/* Top Navbar */}
       <Header
         treeData={treeData}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenTemplates={() => setIsTemplatesOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
@@ -151,30 +163,46 @@ export default function App() {
         onFitToScreen={panZoom.fitToScreen}
       />
 
-      {/* Main Interactive Canvas Area */}
-      <main className="relative flex-1 w-full h-full overflow-hidden">
-        <TreeCanvas
-          treeData={treeData}
-          selectedMemberId={selectedMemberId}
-          onSelect={handleSelectMember}
-          onAddChild={handleOpenAddChild}
-          onAddSpouse={handleOpenAddSpouse}
-          onEdit={handleOpenEdit}
-          onDelete={handleDeleteMember}
-          onToggleCollapse={toggleCollapse}
-          onAddRootParent={handleOpenAddRootParent}
-          panZoom={panZoom}
-          exportRef={exportRef}
-        />
+      {/* Main Content Area */}
+      <main className="relative flex-1 w-full h-full overflow-hidden pb-12 sm:pb-0">
+        {viewMode === 'canvas' ? (
+          <>
+            <TreeCanvas
+              treeData={treeData}
+              selectedMemberId={selectedMemberId}
+              onSelect={handleSelectMember}
+              onAddChild={handleOpenAddChild}
+              onAddSpouse={handleOpenAddSpouse}
+              onEdit={handleOpenEdit}
+              onDelete={handleDeleteMember}
+              onToggleCollapse={toggleCollapse}
+              onAddRootParent={handleOpenAddRootParent}
+              panZoom={panZoom}
+              exportRef={exportRef}
+            />
 
-        {/* Floating Controls Overlay */}
-        <ControlsOverlay
-          panZoom={panZoom}
-          onExpandAll={expandAll}
-          onCollapseAll={collapseAll}
-          onUndo={undo}
-          canUndo={canUndo}
-        />
+            {/* Floating Controls Overlay */}
+            <ControlsOverlay
+              panZoom={panZoom}
+              onExpandAll={expandAll}
+              onCollapseAll={collapseAll}
+              onUndo={undo}
+              canUndo={canUndo}
+            />
+          </>
+        ) : (
+          <VerticalOutlineView
+            treeData={treeData}
+            selectedMemberId={selectedMemberId}
+            onSelect={handleSelectMember}
+            onAddChild={handleOpenAddChild}
+            onAddSpouse={handleOpenAddSpouse}
+            onEdit={handleOpenEdit}
+            onDelete={handleDeleteMember}
+            onToggleCollapse={toggleCollapse}
+            onAddRootParent={handleOpenAddRootParent}
+          />
+        )}
 
         {/* Member Profile Drawer */}
         <MemberDetailDrawer
@@ -189,6 +217,15 @@ export default function App() {
           onFocusMember={handleFocusMember}
         />
       </main>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        onOpenAddModal={() => handleOpenAddChild(treeData)}
+        onOpenStats={() => setIsStatsOpen(true)}
+        onOpenExport={() => setIsExportOpen(true)}
+      />
 
       {/* Add / Edit Member Modal */}
       <MemberModal

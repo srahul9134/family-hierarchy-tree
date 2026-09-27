@@ -7,12 +7,15 @@ import {
   Sparkles, 
   X,
   ChevronRight,
-  Maximize2
+  Maximize2,
+  ListTree
 } from 'lucide-react';
 import { searchTree } from '../utils/treeCalculations';
 
 export const Header = ({
   treeData,
+  viewMode = 'canvas',
+  setViewMode,
   onOpenStats,
   onOpenTemplates,
   onOpenExport,
@@ -39,11 +42,11 @@ export const Header = ({
               Ancestry<span className="text-indigo-400">Tree</span>
             </h1>
             <span className="hidden lg:inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              Interactive
+              Hierarchy
             </span>
           </div>
           <p className="hidden md:block text-[11px] text-slate-400">
-            Maintain family tree hierarchy & connections
+            Interactive multi-generation family trees
           </p>
         </div>
       </div>
@@ -121,7 +124,29 @@ export const Header = ({
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-1 sm:gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Desktop View Switcher (Tree vs List) */}
+        <div className="hidden sm:flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+          <button
+            onClick={() => setViewMode('canvas')}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors ${
+              viewMode === 'canvas' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <GitFork className="w-3.5 h-3.5 rotate-180" />
+            <span>Tree</span>
+          </button>
+          <button
+            onClick={() => setViewMode('outline')}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors ${
+              viewMode === 'outline' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <ListTree className="w-3.5 h-3.5" />
+            <span>List</span>
+          </button>
+        </div>
+
         {/* Mobile Search Toggle */}
         <button
           onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
@@ -131,20 +156,22 @@ export const Header = ({
           <Search className="w-4 h-4 text-indigo-400" />
         </button>
 
-        {/* Fit to screen */}
-        <button
-          onClick={onFitToScreen}
-          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors"
-          title="Fit tree to screen"
-        >
-          <Maximize2 className="w-4 h-4 text-cyan-400" />
-          <span className="hidden xl:inline">Fit</span>
-        </button>
+        {/* Fit to screen (only in canvas mode) */}
+        {viewMode === 'canvas' && (
+          <button
+            onClick={onFitToScreen}
+            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors"
+            title="Fit tree to screen"
+          >
+            <Maximize2 className="w-4 h-4 text-cyan-400" />
+            <span className="hidden xl:inline">Fit</span>
+          </button>
+        )}
 
         {/* Analytics Stats */}
         <button
           onClick={onOpenStats}
-          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors"
+          className="hidden sm:flex p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 items-center gap-1.5 transition-colors"
           title="Tree Analytics"
         >
           <BarChart3 className="w-4 h-4 text-purple-400" />
@@ -164,7 +191,7 @@ export const Header = ({
         {/* Export / Backup */}
         <button
           onClick={onOpenExport}
-          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors"
+          className="hidden sm:flex p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 items-center gap-1.5 transition-colors"
           title="Export / Backup"
         >
           <Download className="w-4 h-4 text-indigo-400" />
