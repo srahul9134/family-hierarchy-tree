@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { PlusCircle, Sparkles } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { TreeBranchConnector } from './TreeBranchConnector';
 
 export const TreeCanvas = ({
@@ -25,6 +25,9 @@ export const TreeCanvas = ({
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
   } = panZoom;
 
   return (
@@ -34,8 +37,12 @@ export const TreeCanvas = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
       className={`
-        relative w-full h-full overflow-hidden bg-grid-pattern select-none
+        relative w-full h-full overflow-hidden bg-grid-pattern select-none touch-none
         ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
       `}
       style={{
@@ -44,12 +51,14 @@ export const TreeCanvas = ({
           linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
           linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px)
         `,
-        backgroundSize: '100% 100%, 36px 36px, 36px 36px'
+        backgroundSize: '100% 100%, 36px 36px, 36px 36px',
+        overscrollBehavior: 'none',
+        touchAction: 'none',
       }}
     >
       {/* Subtle floating ambient background elements */}
-      <div className="absolute top-1/4 left-1/5 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none animate-pulse-subtle" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none animate-pulse-subtle" />
+      <div className="absolute top-1/4 left-1/5 w-72 sm:w-96 h-72 sm:h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none animate-pulse-subtle" />
+      <div className="absolute bottom-1/4 right-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none animate-pulse-subtle" />
 
       {/* Canvas World Transform Container */}
       <div
@@ -58,24 +67,24 @@ export const TreeCanvas = ({
           transformOrigin: '50% 15%',
           transition: isDragging ? 'none' : 'transform 0.1s ease-out',
         }}
-        className="min-w-max min-h-max p-20 flex flex-col items-center justify-start"
+        className="min-w-max min-h-max p-8 sm:p-16 md:p-20 flex flex-col items-center justify-start"
       >
         {/* Export capture container */}
-        <div ref={exportRef} className="p-12 rounded-3xl flex flex-col items-center">
+        <div ref={exportRef} className="p-4 sm:p-8 md:p-12 rounded-3xl flex flex-col items-center">
           
           {/* Add Ancestor / Parent above the Root button */}
-          <div className="mb-6 flex flex-col items-center">
+          <div className="mb-4 sm:mb-6 flex flex-col items-center">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onAddRootParent}
-              className="px-3.5 py-1.5 rounded-full bg-slate-900/90 hover:bg-indigo-900/60 border border-indigo-500/40 text-indigo-300 text-xs font-medium flex items-center gap-1.5 shadow-lg backdrop-blur-md transition-all hover:border-indigo-400 no-pan"
+              className="px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-slate-900/95 hover:bg-indigo-900/60 border border-indigo-500/40 text-indigo-300 text-[11px] sm:text-xs font-medium flex items-center gap-1.5 shadow-lg backdrop-blur-md transition-all hover:border-indigo-400 no-pan"
               title="Add a father/mother ancestor above this current root"
             >
               <PlusCircle className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Add Earlier Ancestor / Parent</span>
+              <span>Add Earlier Ancestor</span>
             </motion.button>
-            <div className="w-0.5 h-4 bg-indigo-500/40" />
+            <div className="w-0.5 h-3 sm:h-4 bg-indigo-500/40" />
           </div>
 
           {/* Root Tree */}
@@ -94,10 +103,10 @@ export const TreeCanvas = ({
             />
           ) : (
             <div className="text-center py-20 text-slate-400">
-              <p className="text-lg">No family tree data available.</p>
+              <p className="text-base sm:text-lg">No family tree data available.</p>
               <button
                 onClick={onAddRootParent}
-                className="mt-4 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm"
+                className="mt-4 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm"
               >
                 Create Root Member
               </button>

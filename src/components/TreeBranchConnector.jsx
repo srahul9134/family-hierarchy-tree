@@ -13,7 +13,6 @@ export const TreeBranchConnector = ({
   onEdit,
   onDelete,
   onToggleCollapse,
-  orientation = 'vertical',
 }) => {
   if (!node) return null;
 
@@ -36,7 +35,6 @@ export const TreeBranchConnector = ({
         onEdit={onEdit}
         onDelete={onDelete}
         onToggleCollapse={onToggleCollapse}
-        orientation={orientation}
       />
 
       {/* Children Branches */}
@@ -50,7 +48,7 @@ export const TreeBranchConnector = ({
             className="flex flex-col items-center w-full"
           >
             {/* Vertical stem line going down from parent */}
-            <div className="w-0.5 h-8 bg-gradient-to-b from-indigo-500/80 to-slate-700 relative overflow-hidden">
+            <div className="w-0.5 h-6 sm:h-8 bg-gradient-to-b from-indigo-500/80 to-slate-700 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-indigo-400 to-transparent animate-pulse" />
             </div>
 
@@ -67,12 +65,12 @@ export const TreeBranchConnector = ({
               )}
 
               {/* Children Nodes Container */}
-              <div className="flex justify-center items-start gap-8 sm:gap-12 md:gap-16 pt-0">
+              <div className="flex justify-center items-start gap-4 sm:gap-8 md:gap-14 pt-0">
                 {node.children.map((child, index) => (
                   <div key={child.id || index} className="relative flex flex-col items-center">
                     {/* Vertical connecting line from bus bar into child */}
-                    <div className="w-0.5 h-8 bg-slate-700 relative">
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-500/60 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+                    <div className="w-0.5 h-6 sm:h-8 bg-slate-700 relative">
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-indigo-500/60 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
                     </div>
 
                     {/* Recursive branch */}
@@ -87,7 +85,6 @@ export const TreeBranchConnector = ({
                       onEdit={onEdit}
                       onDelete={onDelete}
                       onToggleCollapse={onToggleCollapse}
-                      orientation={orientation}
                     />
                   </div>
                 ))}

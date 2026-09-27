@@ -146,9 +146,9 @@ export default function App() {
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenTemplates={() => setIsTemplatesOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
-        onOpenAddModal={() => handleOpenAddChild(treeData)}
         onSelectMember={handleSelectMember}
         onFocusMember={handleFocusMember}
+        onFitToScreen={panZoom.fitToScreen}
       />
 
       {/* Main Interactive Canvas Area */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   X, 
   Upload, 
@@ -9,7 +9,6 @@ import {
   Calendar, 
   MapPin, 
   Briefcase, 
-  FileText, 
   Sparkles, 
   Trash2,
   Check
@@ -19,7 +18,7 @@ import { resizeAndConvertImage, avatarPresets, generateDefaultAvatar } from '../
 
 export const MemberModal = ({
   isOpen,
-  mode = 'edit', // 'add-child', 'add-parent', 'add-spouse', 'edit'
+  mode = 'edit',
   targetNode = null,
   onClose,
   onSubmit,
@@ -189,7 +188,6 @@ export const MemberModal = ({
 
     onSubmit(payload);
 
-    // Trigger celebration confetti
     try {
       confetti({
         particleCount: 50,
@@ -208,57 +206,57 @@ export const MemberModal = ({
       case 'add-child':
         return `Add Child to ${targetNode?.name || 'Family'}`;
       case 'add-parent':
-        return 'Add Ancestor / Senior Parent';
+        return 'Add Ancestor / Parent';
       case 'add-spouse':
-        return `Add / Edit Spouse for ${targetNode?.name || 'Member'}`;
+        return `Spouse for ${targetNode?.name || 'Member'}`;
       default:
         return `Edit Profile: ${targetNode?.name || 'Member'}`;
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto modal-container">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md overflow-y-auto modal-container">
       <motion.div
         initial={{ opacity: 0, scale: 0.92, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.92, y: 20 }}
-        className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden my-8"
+        className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden my-auto"
       >
         {/* Header bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
-              <User className="w-5 h-5" />
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800 bg-slate-950/60">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
+              <User className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-white">{getModalTitle()}</h2>
-              <p className="text-xs text-slate-400">Configure hierarchy attributes, photos, and life milestones</p>
+              <h2 className="text-sm sm:text-base font-semibold text-white">{getModalTitle()}</h2>
+              <p className="hidden sm:block text-xs text-slate-400">Configure hierarchy attributes, photos, and milestones</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[75vh] sm:max-h-[72vh] overflow-y-auto">
           
           {/* Top Avatar Upload Area */}
-          <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-2xl bg-slate-950/50 border border-slate-800">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-3 sm:p-4 rounded-2xl bg-slate-950/50 border border-slate-800">
             <div className="relative group">
               {formData.avatar ? (
                 <img
                   src={formData.avatar}
                   alt={formData.name || 'Avatar'}
-                  className="w-24 h-24 rounded-2xl object-cover ring-2 ring-indigo-500/50 shadow-lg"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-2 ring-indigo-500/50 shadow-lg"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-2xl font-bold text-white shadow-lg ring-2 ring-white/10">
-                  {formData.name ? generateDefaultAvatar(formData.name, formData.gender).initials : <User className="w-10 h-10 text-white/70" />}
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-xl sm:text-2xl font-bold text-white shadow-lg ring-2 ring-white/10">
+                  {formData.name ? generateDefaultAvatar(formData.name, formData.gender).initials : <User className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" />}
                 </div>
               )}
 
@@ -269,7 +267,7 @@ export const MemberModal = ({
                 className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg border border-indigo-400/40 transition-transform active:scale-95"
                 title="Upload photo"
               >
-                <Camera className="w-4 h-4" />
+                <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
               <input
                 ref={fileInputRef}
@@ -280,9 +278,9 @@ export const MemberModal = ({
               />
             </div>
 
-            <div className="flex-1 space-y-2 text-center sm:text-left">
-              <h4 className="text-sm font-medium text-slate-200">Profile Photo</h4>
-              <p className="text-xs text-slate-400">Upload portrait photo from your computer or pick from presets.</p>
+            <div className="flex-1 space-y-1.5 sm:space-y-2 text-center sm:text-left">
+              <h4 className="text-xs sm:text-sm font-medium text-slate-200">Profile Photo</h4>
+              <p className="text-[11px] sm:text-xs text-slate-400">Upload photo from your phone/computer or pick from presets.</p>
               
               <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start pt-1">
                 <button
@@ -301,7 +299,7 @@ export const MemberModal = ({
                   className="px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-xs text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 transition-colors"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Avatar Presets</span>
+                  <span>Presets</span>
                 </button>
 
                 {formData.avatar && (
@@ -321,7 +319,7 @@ export const MemberModal = ({
           {/* Preset Gallery Accordion */}
           {showPresets && (
             <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-2">
-              <span className="text-xs font-medium text-slate-400">Choose an Avatar Preset:</span>
+              <span className="text-xs font-medium text-slate-400">Choose an Avatar:</span>
               <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 pt-1">
                 {avatarPresets.map((preset) => (
                   <button
@@ -338,10 +336,10 @@ export const MemberModal = ({
           )}
 
           {/* Primary Details Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Full Name */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-slate-300 mb-1">
                 Full Name <span className="text-rose-400">*</span>
               </label>
               <input
@@ -350,33 +348,33 @@ export const MemberModal = ({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g. Johnathan Doe"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600"
               />
             </div>
 
             {/* Title / Role */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Title / Hierarchy Role
+              <label className="block text-xs font-medium text-slate-300 mb-1">
+                Title / Role
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g. Eldest Son, Patriarch, Dr."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600"
+                placeholder="e.g. Eldest Son, Patriarch"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600"
               />
             </div>
 
             {/* Gender */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-slate-300 mb-1">
                 Gender
               </label>
               <select
                 value={formData.gender}
                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition-all"
               >
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -386,21 +384,21 @@ export const MemberModal = ({
 
             {/* Relationship tag */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-slate-300 mb-1">
                 Relationship
               </label>
               <input
                 type="text"
                 value={formData.relationship}
                 onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
-                placeholder="e.g. Father, Mother, Son, Granddaughter"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
+                placeholder="e.g. Father, Mother, Son"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
               />
             </div>
 
             {/* Birth Date */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-slate-300 mb-1">
                 Date of Birth / Year
               </label>
               <input
@@ -408,15 +406,15 @@ export const MemberModal = ({
                 value={formData.birthDate}
                 onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
                 placeholder="YYYY-MM-DD or 1980"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
               />
             </div>
 
             {/* Deceased Checkbox + Death Date */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-medium text-slate-300">
-                  Date of Passing (Optional)
+                  Date of Passing
                 </label>
                 <label className="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer">
                   <input
@@ -434,13 +432,13 @@ export const MemberModal = ({
                 value={formData.deathDate}
                 onChange={(e) => setFormData({ ...formData, deathDate: e.target.value })}
                 placeholder={formData.isDeceased ? 'YYYY-MM-DD or 2020' : 'Check Deceased to enable'}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed placeholder:text-slate-600"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed placeholder:text-slate-600"
               />
             </div>
 
             {/* Location */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-slate-300 mb-1">
                 Residence / Location
               </label>
               <input
@@ -448,36 +446,36 @@ export const MemberModal = ({
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 placeholder="e.g. New York, USA"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
               />
             </div>
 
             {/* Occupation */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Occupation / Profession
+              <label className="block text-xs font-medium text-slate-300 mb-1">
+                Occupation
               </label>
               <input
                 type="text"
                 value={formData.occupation}
                 onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
                 placeholder="e.g. Software Architect"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
               />
             </div>
           </div>
 
-          {/* Bio / Life Summary */}
+          {/* Bio */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            <label className="block text-xs font-medium text-slate-300 mb-1">
               Biography & Memories
             </label>
             <textarea
               rows={2}
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              placeholder="Notable milestones, accomplishments, hobbies, stories..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700/80 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
+              placeholder="Notable milestones, accomplishments, hobbies..."
+              className="w-full px-3.5 py-2 rounded-xl bg-slate-950/80 border border-slate-700/80 text-base sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition-all placeholder:text-slate-600"
             />
           </div>
 
@@ -486,7 +484,7 @@ export const MemberModal = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Heart className="w-4 h-4 text-rose-400" />
-                <span className="text-sm font-semibold text-slate-200">Spouse / Partner Details</span>
+                <span className="text-xs sm:text-sm font-semibold text-slate-200">Spouse Details</span>
               </div>
               <button
                 type="button"
@@ -498,10 +496,10 @@ export const MemberModal = ({
             </div>
 
             {showSpouseFields && (
-              <div className="mt-4 p-4 rounded-2xl bg-rose-950/10 border border-rose-500/20 space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="mt-3 p-3 sm:p-4 rounded-2xl bg-rose-950/10 border border-rose-500/20 space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
                       Spouse Name
                     </label>
                     <input
@@ -512,12 +510,12 @@ export const MemberModal = ({
                         spouse: { ...formData.spouse, name: e.target.value }
                       })}
                       placeholder="e.g. Sarah Doe"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-400"
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-950/80 border border-slate-700 text-base sm:text-sm text-white focus:outline-none focus:border-rose-400"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
                       Spouse Gender
                     </label>
                     <select
@@ -526,7 +524,7 @@ export const MemberModal = ({
                         ...formData,
                         spouse: { ...formData.spouse, gender: e.target.value }
                       })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-400"
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-950/80 border border-slate-700 text-base sm:text-sm text-white focus:outline-none focus:border-rose-400"
                     >
                       <option value="female">Female</option>
                       <option value="male">Male</option>
@@ -536,15 +534,15 @@ export const MemberModal = ({
                 </div>
 
                 {/* Spouse photo upload */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   {formData.spouse?.avatar ? (
                     <img
                       src={formData.spouse.avatar}
                       alt="Spouse"
-                      className="w-12 h-12 rounded-xl object-cover ring-1 ring-rose-400"
+                      className="w-10 h-10 rounded-xl object-cover ring-1 ring-rose-400"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
                       {formData.spouse?.name ? generateDefaultAvatar(formData.spouse.name, formData.spouse.gender).initials : 'SP'}
                     </div>
                   )}
@@ -555,7 +553,7 @@ export const MemberModal = ({
                     className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-rose-300 border border-rose-500/30 flex items-center gap-1.5"
                   >
                     <Upload className="w-3.5 h-3.5 text-rose-400" />
-                    <span>Upload Spouse Photo</span>
+                    <span>Upload Photo</span>
                   </button>
                   <input
                     ref={spouseFileInputRef}
@@ -570,17 +568,17 @@ export const MemberModal = ({
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-medium text-slate-300 transition-colors"
+              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs sm:text-sm font-medium text-slate-300 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all active:scale-95"
+              className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition-all active:scale-95"
             >
               <Check className="w-4 h-4" />
               <span>Save Member</span>

@@ -5,11 +5,9 @@ import {
   Download, 
   BarChart3, 
   Sparkles, 
-  PlusCircle, 
-  User, 
   X,
-  Layers,
-  ChevronRight
+  ChevronRight,
+  Maximize2
 } from 'lucide-react';
 import { searchTree } from '../utils/treeCalculations';
 
@@ -18,39 +16,40 @@ export const Header = ({
   onOpenStats,
   onOpenTemplates,
   onOpenExport,
-  onOpenAddModal,
   onSelectMember,
   onFocusMember,
+  onFitToScreen,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const searchResults = searchTree(treeData, searchQuery);
 
   return (
-    <header className="relative z-30 flex items-center justify-between px-4 sm:px-6 py-3.5 bg-slate-900/90 border-b border-slate-800 backdrop-blur-xl">
+    <header className="relative z-30 flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 bg-slate-900/95 border-b border-slate-800 backdrop-blur-xl">
       {/* Left: Brand / Logo */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 ring-2 ring-white/10">
-          <GitFork className="w-5 h-5 rotate-180" />
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 ring-2 ring-white/10">
+          <GitFork className="w-4 h-4 sm:w-5 sm:h-5 rotate-180" />
         </div>
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5 font-sans">
+          <div className="flex items-center gap-1.5">
+            <h1 className="text-sm sm:text-lg font-bold text-white tracking-tight flex items-center gap-1 font-sans">
               Ancestry<span className="text-indigo-400">Tree</span>
             </h1>
-            <span className="hidden md:inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              Interactive Hierarchy
+            <span className="hidden lg:inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              Interactive
             </span>
           </div>
-          <p className="hidden sm:block text-[11px] text-slate-400">
-            Maintain multi-generation family trees & animated connections
+          <p className="hidden md:block text-[11px] text-slate-400">
+            Maintain family tree hierarchy & connections
           </p>
         </div>
       </div>
 
-      {/* Center: Search Bar */}
-      <div className="relative flex-1 max-w-xs sm:max-w-md mx-4">
+      {/* Center: Search Bar (Desktop / Tablet) */}
+      <div className="hidden sm:block relative flex-1 max-w-xs sm:max-w-md mx-3">
         <div className="relative">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -58,8 +57,8 @@ export const Header = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
-            placeholder="Search member, role, spouse, city..."
-            className="w-full pl-9 pr-8 py-2 rounded-2xl bg-slate-950/80 border border-slate-700/80 text-xs sm:text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
+            placeholder="Search relatives, roles, locations..."
+            className="w-full pl-9 pr-8 py-2 rounded-2xl bg-slate-950/80 border border-slate-700/80 text-xs sm:text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
           />
           {searchQuery && (
             <button
@@ -78,7 +77,7 @@ export const Header = ({
               className="fixed inset-0 z-40" 
               onClick={() => setIsSearchFocused(false)} 
             />
-            <div className="absolute left-0 right-0 top-12 z-50 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl p-2 max-h-72 overflow-y-auto space-y-1 backdrop-blur-2xl">
+            <div className="absolute left-0 right-0 top-12 z-50 bg-slate-900/95 border border-slate-700 rounded-2xl shadow-2xl p-2 max-h-72 overflow-y-auto space-y-1 backdrop-blur-2xl">
               {searchResults.length > 0 ? (
                 searchResults.map((member) => (
                   <div
@@ -122,11 +121,30 @@ export const Header = ({
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
+        {/* Mobile Search Toggle */}
+        <button
+          onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+          className="sm:hidden p-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+          title="Search"
+        >
+          <Search className="w-4 h-4 text-indigo-400" />
+        </button>
+
+        {/* Fit to screen */}
+        <button
+          onClick={onFitToScreen}
+          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors"
+          title="Fit tree to screen"
+        >
+          <Maximize2 className="w-4 h-4 text-cyan-400" />
+          <span className="hidden xl:inline">Fit</span>
+        </button>
+
         {/* Analytics Stats */}
         <button
           onClick={onOpenStats}
-          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors shadow-sm"
+          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors"
           title="Tree Analytics"
         >
           <BarChart3 className="w-4 h-4 text-purple-400" />
@@ -136,7 +154,7 @@ export const Header = ({
         {/* Templates */}
         <button
           onClick={onOpenTemplates}
-          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors shadow-sm"
+          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors"
           title="Lineage Templates"
         >
           <Sparkles className="w-4 h-4 text-amber-400" />
@@ -146,13 +164,75 @@ export const Header = ({
         {/* Export / Backup */}
         <button
           onClick={onOpenExport}
-          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors shadow-sm"
-          title="Export / Import"
+          className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800/80 hover:bg-slate-750 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors"
+          title="Export / Backup"
         >
           <Download className="w-4 h-4 text-indigo-400" />
           <span className="hidden lg:inline">Export</span>
         </button>
       </div>
+
+      {/* Mobile Search Overlay Input */}
+      {isMobileSearchOpen && (
+        <div className="sm:hidden absolute top-full left-0 right-0 p-3 bg-slate-900 border-b border-slate-800 shadow-2xl z-50">
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              autoFocus
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search member name, role, city..."
+              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-indigo-500"
+            />
+            <button
+              onClick={() => {
+                setIsMobileSearchOpen(false);
+                setSearchQuery('');
+              }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 p-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {searchQuery.trim().length > 0 && (
+            <div className="mt-2 bg-slate-950 rounded-xl border border-slate-800 p-1 max-h-60 overflow-y-auto space-y-1">
+              {searchResults.length > 0 ? (
+                searchResults.map((member) => (
+                  <div
+                    key={member.id}
+                    onClick={() => {
+                      onFocusMember(member.id);
+                      onSelectMember(member);
+                      setIsMobileSearchOpen(false);
+                      setSearchQuery('');
+                    }}
+                    className="flex items-center justify-between p-2.5 rounded-lg active:bg-slate-800"
+                  >
+                    <div className="flex items-center gap-2">
+                      {member.avatar ? (
+                        <img src={member.avatar} alt={member.name} className="w-7 h-7 rounded-lg object-cover" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-lg bg-indigo-600/30 text-indigo-300 flex items-center justify-center font-bold text-xs">
+                          {member.name.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-xs font-semibold text-white">{member.name}</p>
+                        <p className="text-[10px] text-slate-400">{member.title || member.relationship}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                  </div>
+                ))
+              ) : (
+                <p className="p-3 text-center text-xs text-slate-400">No results found.</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 };

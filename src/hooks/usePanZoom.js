@@ -1,16 +1,26 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-export const usePanZoom = (initialScale = 1, minScale = 0.3, maxScale = 2.5) => {
+export const usePanZoom = (initialScale = 1, minScale = 0.25, maxScale = 2.5) => {
   const [scale, setScale] = useState(initialScale);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
+  const touchDistanceRef = useRef(null);
   const containerRef = useRef(null);
 
   // Center the view on initial load or reset
   const resetView = useCallback(() => {
-    setScale(1);
+    // On small screens, use a slightly smaller default scale to fit more of the tree
+    const isMobile = window.innerWidth < 768;
+    setScale(isMobile ? 0.65 : 1);
     setPosition({ x: 0, y: 0 });
+  }, []);
+
+  // Fit tree to current screen
+  const fitToScreen = useCallback(() => {
+    const isMobile = window.innerWidth < 768;
+    setScale(isMobile ? 0.5 : 0.85);
+    setPosition({ x: 0, y: 20 });
   }, []);
 
   const zoomIn = useCallback(() => {
@@ -27,9 +37,8 @@ export const usePanZoom = (initialScale = 1, minScale = 0.3, maxScale = 2.5) => 
 
   // Handle mouse down for panning
   const handleMouseDown = useCallback((e) => {
-    // Only pan if left click and not clicking on interactive buttons/inputs
     if (e.button !== 0) return;
-    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.no-pan')) return;
+    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea') || e.target.closest('.no-pan')) return;
 
     setIsDragging(true);
     dragStartRef.current = {
@@ -52,7 +61,61 @@ export const usePanZoom = (initialScale = 1, minScale = 0.3, maxScale = 2.5) => 
     setIsDragging(false);
   }, []);
 
-  // Handle wheel zoom
+  // Touch handlers for Mobile Drag & Pinch-to-zoom
+  const handleTouchStart = useCallback((e) => {
+    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea') || e.target.closest('.no-pan') || e.target.closest('.modal-container') || e.target.closest('.drawer-container')) return;
+
+    if (e.touches.length === 1) {
+      // Single finger drag
+      setIsDragging(true);
+      dragStartRef.current = {
+        x: e.touches[0].clientX - position.x,
+        y: e.touches[0].clientY - position.y
+      };
+      touchDistanceRef.current = null;
+    } else if (e.touches.length === 2) {
+      // Two finger pinch
+      setIsDragging(false);
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      touchDistanceRef.current = dist;
+    }
+  }, [position]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (e.target.closest('.modal-container') || e.target.closest('.drawer-container')) return;
+
+    if (e.touches.length === 1 && isDragging) {
+      // Pan
+      e.preventDefault();
+      setPosition({
+        x: e.touches[0].clientX - dragStartRef.current.x,
+        y: e.touches[0].clientY - dragStartRef.current.y
+      });
+    } else if (e.touches.length === 2 && touchDistanceRef.current !== null) {
+      // Pinch to Zoom
+      e.preventDefault();
+      const currentDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const ratio = currentDist / touchDistanceRef.current;
+      setScale(prev => {
+        const next = prev * ratio;
+        return Math.min(Math.max(next, minScale), maxScale);
+      });
+      touchDistanceRef.current = currentDist;
+    }
+  }, [isDragging, minScale, maxScale]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+    touchDistanceRef.current = null;
+  }, []);
+
+  // Handle wheel zoom (desktop)
   const handleWheel = useCallback((e) => {
     if (e.target.closest('.modal-container') || e.target.closest('.drawer-container')) return;
     e.preventDefault();
@@ -73,7 +136,6 @@ export const usePanZoom = (initialScale = 1, minScale = 0.3, maxScale = 2.5) => 
     const elRect = el.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
 
-    // calculate offset to center
     const offsetX = (containerRect.width / 2) - (elRect.left - containerRect.left + (elRect.width / 2));
     const offsetY = (containerRect.height / 2) - (elRect.top - containerRect.top + (elRect.height / 2));
 
@@ -81,6 +143,13 @@ export const usePanZoom = (initialScale = 1, minScale = 0.3, maxScale = 2.5) => 
       x: prev.x + offsetX,
       y: prev.y + offsetY
     }));
+  }, []);
+
+  // Initialize responsive scale on mount
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setScale(0.65);
+    }
   }, []);
 
   useEffect(() => {
@@ -101,10 +170,14 @@ export const usePanZoom = (initialScale = 1, minScale = 0.3, maxScale = 2.5) => 
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
     zoomIn,
     zoomOut,
     setZoom,
     resetView,
+    fitToScreen,
     setPosition,
     centerNode
   };
