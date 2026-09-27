@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-grid-color: rgba(255, 255, 255, 0.03);
+  }
+
+  body {
+    background-color: #090d16;
+    color: #e2e8f0;
+    overflow-x: hidden;
+  }
+}
+
+/* Background grid pattern */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, var(--bg-grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid-color) 1px, transparent 1px);
+}
+
+.bg-radial-gradient {
+  background: radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.15), transparent 70%);
+}
+
+/* Glassmorphism classes */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-hover:hover {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(129, 140, 248, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2), 0 8px 10px -6px rgba(99, 102, 241, 0.1);
+  transform: translateY(-2px);
+}
+
+.glass-card-active {
+  border-color: rgba(129, 140, 248, 0.7);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
+}
+
+/* Custom Tree Connectors & Lines */
+.tree-branch-line {
+  stroke-dasharray: 6 3;
+  animation: branchFlow 20s linear infinite;
+}
+
+@keyframes branchFlow {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
