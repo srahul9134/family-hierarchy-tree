@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PlusCircle } from 'lucide-react';
 import { TreeBranchConnector } from './TreeBranchConnector';
@@ -28,7 +28,13 @@ export const TreeCanvas = ({
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    fitToScreen,
   } = panZoom;
+
+  // Auto-fit when treeData loads or structure updates
+  useEffect(() => {
+    fitToScreen();
+  }, [treeData?.id, fitToScreen]);
 
   return (
     <div
@@ -42,12 +48,12 @@ export const TreeCanvas = ({
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
       className={`
-        relative w-full h-full overflow-hidden bg-grid-pattern select-none touch-none
+        relative w-full h-full overflow-hidden bg-grid-pattern select-none touch-none flex items-start justify-center
         ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
       `}
       style={{
         backgroundImage: `
-          radial-gradient(ellipse at 50% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 65%),
+          radial-gradient(ellipse at 50% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 70%),
           linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
           linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px)
         `,
@@ -56,29 +62,32 @@ export const TreeCanvas = ({
         touchAction: 'none',
       }}
     >
-      {/* Subtle floating ambient background elements */}
-      <div className="absolute top-1/4 left-1/5 w-72 sm:w-96 h-72 sm:h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none animate-pulse-subtle" />
+      {/* Subtle floating ambient background glow */}
+      <div className="absolute top-1/4 left-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none animate-pulse-subtle" />
       <div className="absolute bottom-1/4 right-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none animate-pulse-subtle" />
 
-      {/* Canvas World Transform Container */}
+      {/* Canvas World Transform Container with Centered Origin */}
       <div
         style={{
           transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-          transformOrigin: '50% 15%',
-          transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+          transformOrigin: 'top center',
+          transition: isDragging ? 'none' : 'transform 0.15s ease-out',
         }}
-        className="min-w-max min-h-max p-8 sm:p-16 md:p-20 flex flex-col items-center justify-start"
+        className="inline-flex flex-col items-center justify-start p-6 sm:p-12"
       >
         {/* Export capture container */}
-        <div ref={exportRef} className="p-4 sm:p-8 md:p-12 rounded-3xl flex flex-col items-center">
-          
+        <div 
+          ref={exportRef} 
+          id="tree-export-root"
+          className="p-4 sm:p-8 rounded-3xl flex flex-col items-center"
+        >
           {/* Add Ancestor / Parent above the Root button */}
-          <div className="mb-4 sm:mb-6 flex flex-col items-center">
+          <div className="mb-3 sm:mb-5 flex flex-col items-center">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onAddRootParent}
-              className="px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-slate-900/95 hover:bg-indigo-900/60 border border-indigo-500/40 text-indigo-300 text-[11px] sm:text-xs font-medium flex items-center gap-1.5 shadow-lg backdrop-blur-md transition-all hover:border-indigo-400 no-pan"
+              className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-slate-900/95 hover:bg-indigo-900/60 border border-indigo-500/40 text-indigo-300 text-[11px] sm:text-xs font-medium flex items-center gap-1.5 shadow-lg backdrop-blur-md transition-all hover:border-indigo-400 no-pan"
               title="Add a father/mother ancestor above this current root"
             >
               <PlusCircle className="w-3.5 h-3.5 text-indigo-400" />

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-export const usePanZoom = (initialScale = 1, minScale = 0.25, maxScale = 2.5) => {
+export const usePanZoom = (initialScale = 1, minScale = 0.2, maxScale = 2.5) => {
   const [scale, setScale] = useState(initialScale);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -8,20 +8,63 @@ export const usePanZoom = (initialScale = 1, minScale = 0.25, maxScale = 2.5) =>
   const touchDistanceRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Center the view on initial load or reset
-  const resetView = useCallback(() => {
-    // On small screens, use a slightly smaller default scale to fit more of the tree
-    const isMobile = window.innerWidth < 768;
-    setScale(isMobile ? 0.65 : 1);
-    setPosition({ x: 0, y: 0 });
-  }, []);
+  // Center a specific node ID or root in the viewport
+  const centerNode = useCallback((nodeElementId, customScale = null) => {
+    const el = document.getElementById(nodeElementId);
+    const container = containerRef.current;
+    if (!el || !container) return;
 
-  // Fit tree to current screen
-  const fitToScreen = useCallback(() => {
-    const isMobile = window.innerWidth < 768;
-    setScale(isMobile ? 0.5 : 0.85);
-    setPosition({ x: 0, y: 20 });
-  }, []);
+    const elRect = el.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (customScale !== null) {
+      setScale(customScale);
+    }
+
+    const currentScale = customScale !== null ? customScale : scale;
+    
+    // Calculate the center offset
+    const offsetX = (containerRect.width / 2) - (elRect.left - containerRect.left + (elRect.width / 2));
+    const offsetY = (containerRect.height / 3) - (elRect.top - containerRect.top + (elRect.height / 2));
+
+    setPosition(prev => ({
+      x: prev.x + offsetX,
+      y: prev.y + offsetY
+    }));
+  }, [scale]);
+
+  // Auto-fit & Center the entire tree within the viewport
+  const fitToScreen = useCallback((targetElement = null) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const treeEl = targetElement || container.querySelector('#tree-export-root');
+    if (!treeEl) return;
+
+    const containerWidth = container.clientWidth || window.innerWidth;
+    const containerHeight = container.clientHeight || (window.innerHeight - 120);
+
+    const treeWidth = treeEl.scrollWidth || 600;
+    const treeHeight = treeEl.scrollHeight || 600;
+
+    // Calculate optimal scale with safety margins
+    const scaleX = (containerWidth * 0.9) / treeWidth;
+    const scaleY = (containerHeight * 0.8) / treeHeight;
+    const optimalScale = Math.min(Math.max(Math.min(scaleX, scaleY), minScale), 1.1);
+
+    const roundedScale = Number(optimalScale.toFixed(2));
+    setScale(roundedScale);
+
+    // Center horizontally and place near the top
+    setPosition({
+      x: 0,
+      y: window.innerWidth < 640 ? 30 : 50
+    });
+  }, [minScale]);
+
+  const resetView = useCallback(() => {
+    fitToScreen();
+  }, [fitToScreen]);
 
   const zoomIn = useCallback(() => {
     setScale(prev => Math.min(prev + 0.15, maxScale));
@@ -61,12 +104,11 @@ export const usePanZoom = (initialScale = 1, minScale = 0.25, maxScale = 2.5) =>
     setIsDragging(false);
   }, []);
 
-  // Touch handlers for Mobile Drag & Pinch-to-zoom
+  // Mobile Touch handlers (Drag + Pinch-to-zoom)
   const handleTouchStart = useCallback((e) => {
     if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea') || e.target.closest('.no-pan') || e.target.closest('.modal-container') || e.target.closest('.drawer-container')) return;
 
     if (e.touches.length === 1) {
-      // Single finger drag
       setIsDragging(true);
       dragStartRef.current = {
         x: e.touches[0].clientX - position.x,
@@ -74,7 +116,6 @@ export const usePanZoom = (initialScale = 1, minScale = 0.25, maxScale = 2.5) =>
       };
       touchDistanceRef.current = null;
     } else if (e.touches.length === 2) {
-      // Two finger pinch
       setIsDragging(false);
       const dist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
@@ -88,14 +129,12 @@ export const usePanZoom = (initialScale = 1, minScale = 0.25, maxScale = 2.5) =>
     if (e.target.closest('.modal-container') || e.target.closest('.drawer-container')) return;
 
     if (e.touches.length === 1 && isDragging) {
-      // Pan
       e.preventDefault();
       setPosition({
         x: e.touches[0].clientX - dragStartRef.current.x,
         y: e.touches[0].clientY - dragStartRef.current.y
       });
     } else if (e.touches.length === 2 && touchDistanceRef.current !== null) {
-      // Pinch to Zoom
       e.preventDefault();
       const currentDist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
@@ -115,7 +154,7 @@ export const usePanZoom = (initialScale = 1, minScale = 0.25, maxScale = 2.5) =>
     touchDistanceRef.current = null;
   }, []);
 
-  // Handle wheel zoom (desktop)
+  // Handle wheel zoom
   const handleWheel = useCallback((e) => {
     if (e.target.closest('.modal-container') || e.target.closest('.drawer-container')) return;
     e.preventDefault();
@@ -127,30 +166,13 @@ export const usePanZoom = (initialScale = 1, minScale = 0.25, maxScale = 2.5) =>
     });
   }, [minScale, maxScale]);
 
-  // Center specific element / node in view
-  const centerNode = useCallback((nodeElementId) => {
-    const el = document.getElementById(nodeElementId);
-    const container = containerRef.current;
-    if (!el || !container) return;
-
-    const elRect = el.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-
-    const offsetX = (containerRect.width / 2) - (elRect.left - containerRect.left + (elRect.width / 2));
-    const offsetY = (containerRect.height / 2) - (elRect.top - containerRect.top + (elRect.height / 2));
-
-    setPosition(prev => ({
-      x: prev.x + offsetX,
-      y: prev.y + offsetY
-    }));
-  }, []);
-
-  // Initialize responsive scale on mount
+  // Auto-center on initial mount
   useEffect(() => {
-    if (window.innerWidth < 768) {
-      setScale(0.65);
-    }
-  }, []);
+    const timer = setTimeout(() => {
+      fitToScreen();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [fitToScreen]);
 
   useEffect(() => {
     const container = containerRef.current;

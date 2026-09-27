@@ -37,21 +37,18 @@ export const TreeNode = ({
         return {
           border: 'border-blue-500/40 hover:border-blue-400',
           glow: 'group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]',
-          badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
           dot: 'bg-blue-400',
         };
       case 'female':
         return {
           border: 'border-rose-500/40 hover:border-rose-400',
           glow: 'group-hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]',
-          badge: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
           dot: 'bg-rose-400',
         };
       default:
         return {
           border: 'border-emerald-500/40 hover:border-emerald-400',
           glow: 'group-hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]',
-          badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
           dot: 'bg-emerald-400',
         };
     }
@@ -65,7 +62,7 @@ export const TreeNode = ({
       initial={{ opacity: 0, scale: 0.85, y: 15 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.85, y: -15 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
       id={`node-${node.id}`}
       className="relative flex flex-col items-center group cursor-pointer select-none no-pan"
       onClick={(e) => {
@@ -73,45 +70,45 @@ export const TreeNode = ({
         onSelect(node);
       }}
     >
-      {/* Node Container Card with Glassmorphism */}
+      {/* Node Container Card */}
       <div 
         className={`
-          relative flex items-center p-2.5 sm:p-3.5 rounded-2xl transition-all duration-300 backdrop-blur-xl
+          relative flex items-center p-2 sm:p-3 rounded-2xl transition-all duration-200 backdrop-blur-xl
           ${isSelected 
             ? 'bg-slate-900/95 ring-2 ring-indigo-400 shadow-[0_0_30px_rgba(99,102,241,0.4)] scale-[1.02]' 
-            : 'bg-slate-900/85 hover:bg-slate-800/90 shadow-xl'
+            : 'bg-slate-900/90 hover:bg-slate-850 shadow-xl'
           }
           ${isHighlighted ? 'ring-4 ring-amber-400 animate-pulse' : ''}
           border ${accent.border} ${accent.glow}
-          min-w-[210px] sm:min-w-[240px] max-w-[280px] sm:max-w-[310px]
+          min-w-[185px] sm:min-w-[240px] max-w-[250px] sm:max-w-[310px]
         `}
       >
         {/* Generation Depth Tag */}
-        <div className="absolute -top-2.5 -left-2 px-2 py-0.5 rounded-full bg-slate-950 border border-slate-700 text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1 shadow-sm">
+        <div className="absolute -top-2.5 -left-1.5 px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-950 border border-slate-700 text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1 shadow-sm">
           <span>Gen {depth + 1}</span>
         </div>
 
         {/* Primary Person Section */}
-        <div className="flex items-center gap-2.5 sm:gap-3.5 flex-1 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           {/* Avatar with Photo */}
           <div className="relative flex-shrink-0">
             {node.avatar ? (
               <img
                 src={node.avatar}
                 alt={node.name}
-                className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl object-cover ring-2 ring-white/10 shadow-md group-hover:scale-105 transition-transform duration-300"
+                className="w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl object-cover ring-2 ring-white/10 shadow-md group-hover:scale-105 transition-transform duration-200"
               />
             ) : (
               <div
-                className={`w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${primaryAvatar.color.bg} flex items-center justify-center font-bold text-sm sm:text-lg text-white shadow-md ring-2 ring-white/10 group-hover:scale-105 transition-transform duration-300`}
+                className={`w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl bg-gradient-to-br ${primaryAvatar.color.bg} flex items-center justify-center font-bold text-xs sm:text-base text-white shadow-md ring-2 ring-white/10 group-hover:scale-105 transition-transform duration-200`}
               >
                 {primaryAvatar.initials}
               </div>
             )}
             
-            {/* Gender / Deceased status dot */}
+            {/* Status dot */}
             <span
-              className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-slate-900 ${
+              className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-slate-900 ${
                 node.isDeceased ? 'bg-slate-500' : accent.dot
               } shadow-sm`}
               title={node.isDeceased ? 'Deceased' : (node.gender || 'Unknown')}
@@ -119,36 +116,24 @@ export const TreeNode = ({
           </div>
 
           {/* Info Details */}
-          <div className="flex-1 min-w-0 pr-1">
+          <div className="flex-1 min-w-0 pr-0.5">
             <div className="flex items-center gap-1 flex-wrap">
               <h3 className="font-semibold text-xs sm:text-sm text-slate-100 truncate group-hover:text-indigo-300 transition-colors">
-                {node.name || 'Unnamed Member'}
+                {node.name || 'Unnamed'}
               </h3>
-              {node.isDeceased && (
-                <span className="text-[9px] sm:text-[10px] text-slate-400 bg-slate-800/80 px-1 py-0.2 rounded border border-slate-700">
-                  Dec.
-                </span>
-              )}
             </div>
 
-            <p className="text-[11px] sm:text-xs text-indigo-300/90 font-medium truncate mt-0.5">
-              {node.title || node.relationship || 'Family Member'}
+            <p className="text-[10px] sm:text-xs text-indigo-300/90 font-medium truncate mt-0.5">
+              {node.title || node.relationship || 'Member'}
             </p>
 
             {node.birthDate && (
-              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">
+              <div className="flex items-center gap-1 text-[9px] sm:text-[11px] text-slate-400 mt-0.5 truncate">
                 <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-500 flex-shrink-0" />
                 <span>
                   {new Date(node.birthDate).getFullYear() || node.birthDate}
                   {node.deathDate ? ` – ${new Date(node.deathDate).getFullYear() || node.deathDate}` : ''}
                 </span>
-              </div>
-            )}
-
-            {node.location && (
-              <div className="hidden sm:flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">
-                <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-500 flex-shrink-0" />
-                <span className="truncate">{node.location}</span>
               </div>
             )}
           </div>
@@ -157,7 +142,7 @@ export const TreeNode = ({
         {/* Spouse Tag / Sub-Avatar if present */}
         {node.spouse && node.spouse.name && (
           <div 
-            className="flex flex-col items-center justify-center pl-1.5 sm:pl-2 ml-1 border-l border-slate-800 flex-shrink-0"
+            className="flex flex-col items-center justify-center pl-1.5 ml-1 border-l border-slate-800 flex-shrink-0"
             title={`Spouse: ${node.spouse.name}`}
           >
             <div className="relative">
@@ -165,32 +150,32 @@ export const TreeNode = ({
                 <img
                   src={node.spouse.avatar}
                   alt={node.spouse.name}
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-cover ring-2 ring-rose-400/40 shadow-sm"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover ring-1 ring-rose-400/40 shadow-sm"
                 />
               ) : (
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-[10px] sm:text-xs font-bold text-white ring-2 ring-rose-400/40 shadow-sm">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-[9px] sm:text-xs font-bold text-white ring-1 ring-rose-400/40 shadow-sm">
                   {generateDefaultAvatar(node.spouse.name, node.spouse.gender || 'female').initials}
                 </div>
               )}
-              <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-rose-400 fill-rose-400 absolute -bottom-1 -right-1" />
+              <Heart className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-rose-400 fill-rose-400 absolute -bottom-0.5 -right-0.5" />
             </div>
-            <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium max-w-[42px] sm:max-w-[50px] truncate mt-0.5 text-center">
+            <span className="text-[8px] sm:text-[10px] text-slate-400 font-medium max-w-[38px] sm:max-w-[48px] truncate mt-0.5 text-center">
               {node.spouse.name.split(' ')[0]}
             </span>
           </div>
         )}
 
         {/* Action Menu Trigger */}
-        <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1">
+        <div className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 flex items-center">
           <button
             onClick={(e) => {
               e.stopPropagation();
               setShowQuickMenu(!showQuickMenu);
             }}
-            className="p-1 sm:p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
             title="Options"
           >
-            <MoreHorizontal className="w-3.5 h-3.5" />
+            <MoreHorizontal className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </button>
         </div>
 
@@ -202,7 +187,7 @@ export const TreeNode = ({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 5 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-9 z-50 bg-slate-900/95 border border-slate-700 rounded-xl shadow-2xl p-1.5 w-44 backdrop-blur-2xl flex flex-col gap-1 no-pan"
+              className="absolute right-0 top-8 z-50 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-1.5 w-40 sm:w-44 backdrop-blur-2xl flex flex-col gap-0.5 no-pan"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -210,10 +195,10 @@ export const TreeNode = ({
                   setShowQuickMenu(false);
                   onSelect(node);
                 }}
-                className="flex items-center gap-2 px-2.5 py-2 sm:py-1.5 rounded-lg text-xs text-slate-200 hover:bg-slate-800 hover:text-indigo-300 text-left transition-colors"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-slate-200 hover:bg-slate-800 hover:text-indigo-300 text-left transition-colors"
               >
                 <Eye className="w-3.5 h-3.5 text-indigo-400" />
-                <span>View Full Profile</span>
+                <span>View Profile</span>
               </button>
 
               <button
@@ -221,7 +206,7 @@ export const TreeNode = ({
                   setShowQuickMenu(false);
                   onAddChild(node);
                 }}
-                className="flex items-center gap-2 px-2.5 py-2 sm:py-1.5 rounded-lg text-xs text-slate-200 hover:bg-slate-800 hover:text-emerald-300 text-left transition-colors"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-slate-200 hover:bg-slate-800 hover:text-emerald-300 text-left transition-colors"
               >
                 <UserPlus className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Add Child</span>
@@ -232,7 +217,7 @@ export const TreeNode = ({
                   setShowQuickMenu(false);
                   onAddSpouse(node);
                 }}
-                className="flex items-center gap-2 px-2.5 py-2 sm:py-1.5 rounded-lg text-xs text-slate-200 hover:bg-slate-800 hover:text-rose-300 text-left transition-colors"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-slate-200 hover:bg-slate-800 hover:text-rose-300 text-left transition-colors"
               >
                 <Heart className="w-3.5 h-3.5 text-rose-400" />
                 <span>{node.spouse ? 'Edit Spouse' : 'Add Spouse'}</span>
@@ -243,7 +228,7 @@ export const TreeNode = ({
                   setShowQuickMenu(false);
                   onEdit(node);
                 }}
-                className="flex items-center gap-2 px-2.5 py-2 sm:py-1.5 rounded-lg text-xs text-slate-200 hover:bg-slate-800 hover:text-amber-300 text-left transition-colors"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-slate-200 hover:bg-slate-800 hover:text-amber-300 text-left transition-colors"
               >
                 <Edit3 className="w-3.5 h-3.5 text-amber-400" />
                 <span>Edit Details</span>
@@ -256,7 +241,7 @@ export const TreeNode = ({
                   setShowQuickMenu(false);
                   onDelete(node);
                 }}
-                className="flex items-center gap-2 px-2.5 py-2 sm:py-1.5 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 text-left transition-colors"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 text-left transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5 text-rose-400" />
                 <span>Delete Branch</span>
@@ -268,7 +253,7 @@ export const TreeNode = ({
 
       {/* Collapse / Expand Indicator with Child Count */}
       {hasChildren && (
-        <div className="relative mt-1.5 sm:mt-2 z-10">
+        <div className="relative mt-1 sm:mt-1.5 z-10">
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
@@ -277,7 +262,7 @@ export const TreeNode = ({
               onToggleCollapse(node.id);
             }}
             className={`
-              flex items-center gap-1 px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-medium transition-all shadow-md
+              flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[11px] font-medium transition-all shadow-md
               ${isCollapsed 
                 ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/30' 
                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
@@ -287,12 +272,12 @@ export const TreeNode = ({
           >
             {isCollapsed ? (
               <>
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 <span>{node.children.length} {node.children.length === 1 ? 'child' : 'children'}</span>
               </>
             ) : (
               <>
-                <ChevronDown className="w-3 h-3" />
+                <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 <span>{node.children.length}</span>
               </>
             )}
